@@ -1,9 +1,0 @@
-{
-    "Version": "1.1",
-    "Data": {
-        "Source": "d:\\programfiles\\compiler\\vs2022\\cplusgames\\coolrun\\obstacles.ixx",
-        "ProvidedModule": "obstacles",
-        "ImportedModules": [],
-        "ImportedHeaderUnits": []
-    }
-}
