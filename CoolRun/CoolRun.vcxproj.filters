@@ -33,6 +33,9 @@
     <ClCompile Include="obstacles.ixx">
       <Filter>头文件\Module</Filter>
     </ClCompile>
+    <ClCompile Include="base.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\bark\Background_01-1.png">
@@ -301,6 +304,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tools.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
