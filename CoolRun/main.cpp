@@ -22,8 +22,11 @@ int main(void) {
 			master.keyCatch();
 			BeginBatchDraw();					// »º³å´òÓ¡
 			master.updateBackgroud();			// ±³¾°äÖÈ¾
-			master.heroRun(hIndex);				// Ó¢ĞÛäÖÈ¾
-			master.tortoiseProduct();			// ÎÚ¹êÕÏ°­ÎïäÖÈ¾
+			if (!master.getCanDown())			// Ó¢ĞÛäÖÈ¾
+				master;
+			else
+				master.heroRun(hIndex);
+			master.obProduct();					// ÕÏ°­ÎïäÖÈ¾
 			EndBatchDraw();						// ½áÊø
 			master.bgSlide();
 			if (master.getCanJump() == true)	// heroÌøÔ¾¹ı³ÌÖĞ²»±¼ÅÜ
