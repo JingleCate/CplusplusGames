@@ -6,7 +6,7 @@
 
 ### 1 CoolRun
 
-- 该项目资源来源于**[Bilibili](https://www.bilibili.com/video/BV1Ca411k7wU?p=17&spm_id_from=pageDriver&vd_source=41e7e0e737d748569af7bd28d7a17e95)**
+- 该项目资源来源于[Bilibili](https://www.bilibili.com/video/BV1Ca411k7wU?p=17&spm_id_from=pageDriver&vd_source=41e7e0e737d748569af7bd28d7a17e95)
 
 #### 1.1 文件结构：
 
