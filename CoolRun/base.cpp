@@ -5,19 +5,19 @@ Hero::Hero(int count) {
 		// 加载英雄下蹲时的图片
 		loadimage(&heros[0], "res/d1.png");
 		loadimage(&heros[1], "res/d2.png");
-		hDstX = int(WIDTH * 0.5 - heros[0].getheight() * 0.5);
 		hDstY = 370 - heros[0].getheight();
 	}
-	else if (count == 12) {
+	else{
 		// 加载英雄图片
 		char name[64];
 		for (int i = 0; i < 12; i++) {
 			sprintf_s(name, "res/hero%d.png", i + 1);
 			loadimage(&heros[i], name);
 		}
-		hDstX = int(WIDTH * 0.5 - heros[0].getheight() * 0.5);
 		hDstY = 345 - heros[0].getheight();
 	}
+
+	hDstX = int(WIDTH * 0.5 - heros[0].getheight() * 0.5);
 	// 初始化hero坐标
 	canDown = true;				// 默认初始条件下可以下蹲
 	canJump = true;				// 默认初始条件下可以起跳
@@ -41,7 +41,7 @@ BackGround::BackGround() {
 	for (int i = 0; i < 3; i++) {
 		// 路径存到name缓冲区
 		sprintf_s(name, "res/bg%03d.png", i + 1);// sprintf生成文件名
-		loadimage(&imgs[i], name);// 这里调节字符集(项目)
+		loadimage(&imgs[i], name);				// 这里调节字符集(项目)
 		bgdstX[i] = 0;
 	}
 }
@@ -54,7 +54,6 @@ BackGround::BackGround() {
  * @param height height of window
  */
 CoolRun::CoolRun() {
-	initgraph(WIDTH, HEIGHT);
 
 	char name[64];
 	update = false;
@@ -86,7 +85,7 @@ CoolRun::CoolRun() {
 	for (int i = 0; i < 4; i++) {
 		IMAGE imgH;							
 		sprintf_s(name, "res/h%d.png", i + 1);
-		loadimage(&imgH, name, 63, 260, true);
+		loadimage(&imgH, name, 50, 250, true);
 		oTemp.push_back(imgH);
 		oImgs.push_back(oTemp);
 		oTemp.clear();
@@ -103,6 +102,12 @@ CoolRun::CoolRun() {
 		//	obst[i].type = LION;
 	}
 
+	lastObst = -1;
+
+	heroBlood = 100;			// 开局满血
+	// 预加载音效
+	preLoadSound("res/hit.mp3");
+	mciSendString("play res/bg.mp3", 0, 0, 0);
 }
 
 // 图片滑动效果
@@ -280,22 +285,40 @@ void CoolRun::createObstacle(){
 	//if (update = true)
 		//i = 0;
 	obst[i].exist = true;
+	obst[i].isHited = false;
 	obst[i].index = 0;
-	obst[i].type = obstacle_t(rand() % NOW_OBSTACLE_COUNT);
+	obst[i].type = obstacle_t(rand() % 3);
+
+	if (lastObst >= 0 &&
+		obst[lastObst].type >= HOOK1 &&
+		obst[lastObst].type <= HOOK4 &&
+		obst[i].type == LION &&
+		obst[lastObst].ox > WIDTH - 500) {
+		obst[i].type = TORTOISE;
+	}
+	lastObst = i;
+	if (obst[i].type == HOOK1) {
+		obst[i].type = obstacle_t(int(obst[i].type) + rand() % 4);
+	}
 	obst[i].ox = WIDTH;
 	//obst[i].oy = 320 - oImgs[obst[i].type][0].getheight();
 
+
+
 	if (obst[i].type == TORTOISE) {
-		obst[i].speed = 8;
+		obst[i].speed = 5;
 		obst[i].oy = 310;
+		obst[i].power = 5;
 	}
 	else if (obst[i].type == LION) {
 		obst[i].speed = 8;
 		obst[i].oy = 260;
+		obst[i].power = 20;
 	}
 	else {
-		obst[i].speed = 4;
-		obst[i].oy = 0;
+		obst[i].speed = 5;
+		obst[i].oy = 10;
+		obst[i].power = 10;
 	}
 
 }
@@ -311,19 +334,83 @@ void CoolRun::down(){
 	// 这里复用了deIndex变量
 	if (hrDown.dgIndex == 0) {
 		frames[0]++;
-		if (frames[0] >= 5) {
+		if (frames[0] >= 10) {
 			frames[0] = 0;
 			hrDown.dgIndex++;
 		}
 		
 	}
-		
 	else if (hrDown.dgIndex == 1) {
 		frames[1]++;
-		if (frames[1] >= 10) {
+		if (frames[1] >= 25) {
 			hrDown.canDown = true;
 			frames[1] = 0;
 			hrDown.dgIndex = 0;
 		}
 	}
+}
+
+/**
+ * 检测hero与obstacle是否碰撞.
+ * <p>模糊碰撞</p>
+ * \param heroIndex
+ */
+void CoolRun::checkCrash(int heroIndex) {
+	// 对每个障碍物检测,检测只需输入矩形左上角和右下角内矩坐标
+	static int offset = 30;			//偏移量
+	int a1x, a2x, a1y, a2y;			// hero
+	int b1x, b2x, b1y, b2y;			// obstacle
+	for (int i = 0; i < OBSTACLE_COUNT; i++){
+		if (obst[i].exist == true && obst[i].isHited == false) {
+			// 奔跑,跳跃
+			if (hrDown.canDown == true) {
+				a1x = hr.hDstX + offset;
+				a1y = hr.hDstY + offset;
+				a2x = hr.hDstX + hr.heros[heroIndex].getwidth() - offset;
+				a2y = hr.hDstY + hr.heros[heroIndex].getheight();
+			}
+			else {
+				a1x = hrDown.hDstX + offset;
+				a1y = 345 - hrDown.heros[hrDown.dgIndex].getheight();
+				a2x = hrDown.hDstX + hrDown.heros[hrDown.dgIndex].getwidth() - offset;
+				a2y = 345;
+			}
+			b1x = obst[i].ox + offset;
+			b1y = obst[i].oy + offset;
+			b2x = obst[i].ox + oImgs[obst[i].type][obst[i].index].getwidth() - offset;
+			b2y = obst[i].oy + oImgs[obst[i].type][obst[i].index].getheight() - 10;
+			// 判断两个矩阵是否相交
+			if (rectIntersect(a1x, a1y, a2x, a2y, b1x, b1y, b2x, b2y)) {
+				heroBlood -= obst[i].power;				// 这里扣除血量
+				// std::cout << "剩余血量:" << heroBlood << '\n';
+				playSound("res/hit.mp3");
+				obst[i].isHited = true;
+			}
+		}
+		
+	}
+}
+
+void CoolRun::upBloodBar() {
+	drawBloodBar(10, 10, 200, 10, 2, BLUE, DARKGRAY, RED, float(heroBlood / 100.0));
+}
+
+bool CoolRun::checkOver() {
+	// 结束
+	if (heroBlood <= 0) {
+		// 0 标准输出
+		loadimage(0, "res/over.png");
+		FlushBatchDraw();
+		mciSendString("stop res/bg.mp3", 0, 0, 0);
+		return true;
+	}
+	return false;
+	
+}
+
+void init() {
+	initgraph(WIDTH, HEIGHT);
+	loadimage(0, "res/over.png");
+	mciSendString("play res/bg.mp3", 0, 0, 0);
+	system("pause");
 }

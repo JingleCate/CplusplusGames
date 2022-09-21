@@ -12,7 +12,7 @@
 #include <conio.h>
 #include <vector>
 #include "tools.h"
-
+#include <iostream>
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")		// 连接到winmm库
 
@@ -61,15 +61,19 @@ struct Obstacle {
 	int index;						// 图片索引
 	int speed;						// 移动速度
 	bool exist;						// 当前界面是否存在
+	int power;						// 杀伤力
+	bool isHited;					// 是否已经碰撞
 };
 
 class CoolRun {
 private:
 
 	BackGround bg;									// 背景
+	int heroBlood;									// 英雄血量
 	Hero hr;										// 英雄图片
 	Hero hrDown = Hero(2);							// 下蹲时英雄图片
 	bool update;
+	int lastObst;									// 上一次障碍物
 
 	std::vector<std::vector<IMAGE>> oImgs;			// 障碍物图标
 	Obstacle obst[OBSTACLE_COUNT];					// 障碍物数量
@@ -79,6 +83,7 @@ public:
 	CoolRun();										// 构造函数
 	~CoolRun() {};									// 析构函数
 	// 函数声明
+	//void initPage();								// 初始界面
 	void updateBackgroud();
 	void bgSlide();
 	void heroRun(int heroIndex);
@@ -90,4 +95,9 @@ public:
 	void createObstacle();							// 创建障碍物
 	void down();									// 下蹲
 	inline bool getCanDown() { return hrDown.canDown; }
+	void checkCrash(int heroIndex);					// 检查碰撞
+	void upBloodBar();								// 加载血条
+	bool checkOver();								// 检查游戏是否结束
 };
+
+void init();			// 初始化界面

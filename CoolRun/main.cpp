@@ -10,7 +10,9 @@
 #include "tools.h"
 import obstacles;
 
+
 int main(void) {
+	init();
 	CoolRun master;
 	//ÊµÊ±äÖÈ¾
 	int hIndex = 0, timer = 0;					// ¼ÆÊ±Æ÷
@@ -22,12 +24,14 @@ int main(void) {
 			master.keyCatch();
 			BeginBatchDraw();					// »º³å´òÓ¡
 			master.updateBackgroud();			// ±³¾°äÖÈ¾
-			if (!master.getCanDown())			// Ó¢ĞÛäÖÈ¾
-				master;
-			else
-				master.heroRun(hIndex);
+			master.heroRun(hIndex);				// Ó¢ĞÛäÖÈ¾
 			master.obProduct();					// ÕÏ°­ÎïäÖÈ¾
+			master.checkCrash(hIndex);			// ¼ì²âÏàÅö×²
+			master.upBloodBar();				// ÑªÌõ´òÓ¡
 			EndBatchDraw();						// ½áÊø
+			
+			if (master.checkOver())
+				break;
 			master.bgSlide();
 			if (master.getCanJump() == true)	// heroÌøÔ¾¹ı³ÌÖĞ²»±¼ÅÜ
 				hIndex = (hIndex + 1) % 12;
@@ -35,7 +39,7 @@ int main(void) {
 
 		
 	}
-
+	system("pause");
 	return 0;
 
 }
