@@ -6,7 +6,7 @@
 
 ### 1 CoolRun
 
-- 该项目资源来源于**[Bilibili](https://www.bilibili.com/video/BV1Ca411k7wU?p=17&spm_id_from=pageDriver&vd_source=41e7e0e737d748569af7bd28d7a17e95)**
+- 该项目资源来源于[Bilibili](https://www.bilibili.com/video/BV1Ca411k7wU?p=17&spm_id_from=pageDriver&vd_source=41e7e0e737d748569af7bd28d7a17e95)
 
 #### 1.1 文件结构：
 
@@ -25,9 +25,18 @@
 
 #### 1.2 代码解析
 
+​	第一个项目没有什么可说的，主要是重新复习一下知识（热身）
 
+操作：
 
+- `Space`起跳
+- `Z` or`z` 下蹲
 
+​	初始按任意键进入即可~~
+
+​	其实这个项目有许多的问题，比如跳跃的手感和下蹲的手感差强人意，不过这都问题不大(bushi)....
+
+初始和终态界面都没有优化，按任意键即可开始或退出。后面慢慢优化吧..
 
 ---
 

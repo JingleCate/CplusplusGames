@@ -12,6 +12,8 @@ import obstacles;
 
 
 int main(void) {
+	srand((unsigned)time(NULL));
+
 	init();
 	CoolRun master;
 	//实时渲染
@@ -27,10 +29,11 @@ int main(void) {
 			master.heroRun(hIndex);				// 英雄渲染
 			master.obProduct();					// 障碍物渲染
 			master.checkCrash(hIndex);			// 检测相碰撞
+			master.upScore();
 			master.upBloodBar();				// 血条打印
 			EndBatchDraw();						// 结束
 			
-			if (master.checkOver())
+			if (master.checkOver()) 
 				break;
 			master.bgSlide();
 			if (master.getCanJump() == true)	// hero跳跃过程中不奔跑

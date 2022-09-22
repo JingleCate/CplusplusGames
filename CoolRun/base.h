@@ -20,6 +20,7 @@
 #define HEIGHT 396
 #define OBSTACLE_COUNT 10
 #define DOWNIMG 2
+#define WIN_SCORE 3
 
 
 // 障碍物类型:tortoise lion
@@ -63,6 +64,7 @@ struct Obstacle {
 	bool exist;						// 当前界面是否存在
 	int power;						// 杀伤力
 	bool isHited;					// 是否已经碰撞
+	bool passed;					// 是否已经通过
 };
 
 class CoolRun {
@@ -74,9 +76,12 @@ private:
 	Hero hrDown = Hero(2);							// 下蹲时英雄图片
 	bool update;
 	int lastObst;									// 上一次障碍物
+	int score;										// 分数,上不封顶
+	IMAGE number[10];								// 数字
 
 	std::vector<std::vector<IMAGE>> oImgs;			// 障碍物图标
 	Obstacle obst[OBSTACLE_COUNT];					// 障碍物数量
+	//bool isCrashed[OBSTACLE_COUNT] = {false};
 	void jump();
 
 public:
@@ -92,12 +97,28 @@ public:
 	inline bool getUpdate() { return update; }
 	inline void setUpdate(bool value) { update = value; }
 	bool getCanJump();
-	void createObstacle();							// 创建障碍物
-	void down();									// 下蹲
+	// 创建障碍物
+	void createObstacle();							
+	// 下蹲
+	void down();									
 	inline bool getCanDown() { return hrDown.canDown; }
-	void checkCrash(int heroIndex);					// 检查碰撞
-	void upBloodBar();								// 加载血条
-	bool checkOver();								// 检查游戏是否结束
+
+	/**
+	 * 检测hero与obstacle是否碰撞.
+	 * <p>模糊碰撞</p>
+	 * \param heroIndex
+	 */
+	void checkCrash(int heroIndex);					
+	// 加载血条
+	void upBloodBar();	
+	/**
+	 * 更新分数.
+	 * 
+	 * \param isCrashed 是否相撞
+	 */
+	void upScore();
+	// 检查游戏是否结束
+	bool checkOver();								
 };
 
 void init();			// 初始化界面

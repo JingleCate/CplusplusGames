@@ -96,13 +96,21 @@ CoolRun::CoolRun() {
 		obst[i].exist = false;
 		obst[i].index = 0;
 		obst[i].ox = WIDTH;
+		obst[i].passed = false;
+
 		////if (i < OBSTACLE_COUNT)
 		//	obst[i].type = TORTOISE;
 		//else
 		//	obst[i].type = LION;
 	}
 
+	for (int i = 0; i < 10; i++) {
+		sprintf_s(name, "res/sz/%d.png", i);
+		loadimage(&number[i], name);
+	}
+
 	lastObst = -1;
+	score = 0;
 
 	heroBlood = 100;			// 开局满血
 	// 预加载音效
@@ -177,6 +185,8 @@ void CoolRun::keyCatch() {
 				down();
 				update = true;
 			}
+			/*else if (key == 'Q' || key == 'q')
+				checkOver();*/
 		}
 	}
 	else
@@ -286,6 +296,8 @@ void CoolRun::createObstacle(){
 		//i = 0;
 	obst[i].exist = true;
 	obst[i].isHited = false;
+	obst[i].passed = false;
+	//obst[i].isHited = false;
 	obst[i].index = 0;
 	obst[i].type = obstacle_t(rand() % 3);
 
@@ -357,6 +369,7 @@ void CoolRun::down(){
  */
 void CoolRun::checkCrash(int heroIndex) {
 	// 对每个障碍物检测,检测只需输入矩形左上角和右下角内矩坐标
+	
 	static int offset = 30;			//偏移量
 	int a1x, a2x, a1y, a2y;			// hero
 	int b1x, b2x, b1y, b2y;			// obstacle
@@ -385,7 +398,11 @@ void CoolRun::checkCrash(int heroIndex) {
 				// std::cout << "剩余血量:" << heroBlood << '\n';
 				playSound("res/hit.mp3");
 				obst[i].isHited = true;
+				if (score >= 5)
+					score -= 5;						// 扣除分数
 			}
+			// 成功避过障碍物
+			
 		}
 		
 	}
@@ -393,6 +410,16 @@ void CoolRun::checkCrash(int heroIndex) {
 
 void CoolRun::upBloodBar() {
 	drawBloodBar(10, 10, 200, 10, 2, BLUE, DARKGRAY, RED, float(heroBlood / 100.0));
+
+	char str[10];
+	int x = 10, y = 25;
+	sprintf_s(str, "%d", score);
+	for (int i = 0; str[i]; i++) {
+		int sz = str[i] - '0';
+		putimagePNG(x, y, &number[sz]);
+		x += number[sz].getwidth() + 5;
+	}
+
 }
 
 bool CoolRun::checkOver() {
@@ -402,7 +429,21 @@ bool CoolRun::checkOver() {
 		loadimage(0, "res/over.png");
 		FlushBatchDraw();
 		mciSendString("stop res/bg.mp3", 0, 0, 0);
+		score = 0;
+		heroBlood = 100;
 		return true;
+	}
+	else if (score >= WIN_SCORE) {
+		FlushBatchDraw();
+		mciSendString("play res/win.mp3", 0, 0, 0);
+		Sleep(2500);
+		loadimage(0, "res/win.png");
+		FlushBatchDraw();
+		mciSendString("stop res/bg.mp3", 0, 0, 0);
+		score = 0;
+		heroBlood = 100;
+		return true;
+		mciSendString("play res/bg.mp3 repeat", 0, 0, 0);
 	}
 	return false;
 	
@@ -413,4 +454,20 @@ void init() {
 	loadimage(0, "res/over.png");
 	mciSendString("play res/bg.mp3", 0, 0, 0);
 	system("pause");
+}
+
+void CoolRun::upScore() {
+	for (int i = 0; i < OBSTACLE_COUNT; i++) {
+		if (obst[i].exist == true && obst[i].isHited == false) {
+			if (hr.hDstX >= (obst[i].ox + oImgs[obst[i].type][0].getwidth()) && obst[i].passed == false) {
+				if (obst[i].type == TORTOISE)
+					score += 1;
+				else if (obst[i].type == LION)
+					score += 2;
+				else
+					score += 2;
+				obst[i].passed = true;
+			}
+		}
+	}
 }
